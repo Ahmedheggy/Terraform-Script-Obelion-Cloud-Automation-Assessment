@@ -27,12 +27,3 @@ resource "aws_subnet" "private" {
   }
 }
 
-moved {
-  from = aws_subnet.public
-  to   = aws_subnet.public[0]
-}
-
-moved {
-  from = aws_subnet.private
-  to   = aws_subnet.private[0]
-}

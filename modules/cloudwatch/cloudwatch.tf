@@ -1,4 +1,4 @@
-# Create CloudWatch Alarm for high CPU utilization on both EC2 instances
+# CloudWatch Alarm for high CPU utilization on both EC2 instances
 resource "aws_cloudwatch_metric_alarm" "cpu_high" {
   count               = length(var.instance_ids)
   alarm_name          = "High-CPU-Utilization-Instance-${var.instance_ids[count.index]}"
@@ -30,12 +30,12 @@ resource "aws_cloudwatch_metric_alarm" "cpu_high" {
   unit = "Percent"
 }
 
-# Create SNS Topic for alert notifications
+# SNS Topic for alert notifications
 resource "aws_sns_topic" "alerts" {
   name = "alerts-topic"
 }
 
-# Subscribe an email to the SNS Topic for notifications
+# add email to SNS Topic
 resource "aws_sns_topic_subscription" "email" {
   topic_arn = aws_sns_topic.alerts.arn
   protocol  = "email"

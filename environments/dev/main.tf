@@ -4,8 +4,6 @@ provider "aws" {
 }
 
 
-
-# Calling Modules
 module "network" {
   source = "../../modules/network" # Adjusted path since we are in environments/dev
   environment = var.environment
