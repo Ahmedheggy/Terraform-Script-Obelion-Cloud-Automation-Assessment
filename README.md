@@ -5,18 +5,26 @@ This repository contains the assessment tasks for the Obelion Cloud Automation r
 ## TaskGroup A
 
 The infrastructure code and documentation for TaskGroup A can be found in the [TaskGroupA](./TaskGroupA) directory.
+.
+├── environments/       # Environment-specific configurations (dev)
+│   └── dev/            # Development environment
+│       ├── main.tf     # Main configuration entry point
+│       ├── variables.tf# Variable definitions
+│       ├── outputs.tf  # Output definitions
+│       └── backend.tf  # Backend configuration
+├── modules/            # Reusable Terraform modules
+│   ├── network/        # VPC, Subnets, IGW, Route Tables
+│   ├── ec2/            # EC2 Instances, Security Groups
+│   ├── rds/            # RDS Database
+│   ├── cloudwatch/     # CloudWatch monitoring
+│   ├── iam/            # IAM roles and policies
+│   └── kms_and_secrets_manager/ # KMS and Secrets Manager
+└── README.md           # Project documentation
+```
 
 ## TaskGroup B
 
-This section details the repositories and evidence for TaskGroup B.
-
-### Project Structure
-
-```
-Task-GroupB/
-├── Task-GroupB1/      # Uptime Kuma Deployment
-└── Task-GroupB2/      # Laravel Application Deployment
-```
+This section details the repositories and screenshots for TaskGroup B.
 
 ### TaskGroup B1: Uptime Kuma
 
@@ -24,18 +32,14 @@ Task-GroupB/
 
 #### Screenshots
 
-<img src="./Task-GroupB/Task-GroupB1/TaskGroupB1.png" width="600" alt="TaskGroupB1">
-
-<img src="./Task-GroupB/Task-GroupB1/TaskGroupB-1.png" width="600" alt="TaskGroupB-1">
-
-<img src="./Task-GroupB/Task-GroupB1/Deployment.png" width="600" alt="Deployment">
-
+![TaskGroupB1](./Task-GroupB/Task-GroupB1/TaskGroupB1.png)
+![TaskGroupB-1](./Task-GroupB/Task-GroupB1/TaskGroupB-1.png)
+![Deployment](./Task-GroupB/Task-GroupB1/Deployment.png)
 ### TaskGroup B2: Laravel Application
 
 *   **Repository:** [https://github.com/Ahmedheggy/laravel.git](https://github.com/Ahmedheggy/laravel.git)
 
 #### Screenshots
 
-<img src="./Task-GroupB/Task-GroupB2/TaskGroupB2.png" width="600" alt="TaskGroupB2">
-
-<img src="./Task-GroupB/Task-GroupB2/migration-prove.png" width="600" alt="Migration Proof">
+![TaskGroupB2](./Task-GroupB/Task-GroupB2/TaskGroupB2.png)
+![Migration Proof](./Task-GroupB/Task-GroupB2/migration-prove.png)
