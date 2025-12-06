@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./obelion-banner.png" alt="Obelion Cloud Automation Assessment Banner" width="80%">
+  <img src="./obelion-banner.png" alt="Obelion Cloud Automation Assessment Banner" width="70%">
 </p>
 
 # Obelion Cloud Automation Assessment
