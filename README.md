@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./obelion-banner.png" alt="Obelion Cloud Automation Assessment Banner" width="40%">
+  <img src="./obelion-banner.png" alt="Obelion Cloud Automation Assessment Banner" width="60%">
 </p>
 
 # Obelion Cloud Automation Assessment
@@ -24,7 +24,7 @@ This section details the repositories and screenshots for TaskGroup B.
 **GitHub Actions Workflow Configuration**
 ![TaskGroupB1](./Task-GroupB/Task-GroupB1/TaskGroupB1.png)
 
-**Build Step Execution**
+**Successful Build & Deployment**
 ![TaskGroupB-1](./Task-GroupB/Task-GroupB1/TaskGroupB-1.png)
 
 **Successful Deployment to Ubuntu 22.04 Server**
@@ -36,8 +36,8 @@ This section details the repositories and screenshots for TaskGroup B.
 
 #### Screenshots
 
-**GitHub Actions Workflow & Deployment Script**
+**GitHub Actions Workflow**
 ![TaskGroupB2](./Task-GroupB/Task-GroupB2/TaskGroupB2.png)
 
-**Database Migration Execution Proof**
+**Database Migration Execution & Script**
 ![Migration Proof](./Task-GroupB/Task-GroupB2/migration-prove.png)
