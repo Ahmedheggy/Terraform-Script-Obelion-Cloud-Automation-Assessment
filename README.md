@@ -5,22 +5,6 @@ This repository contains the assessment tasks for the Obelion Cloud Automation r
 ## TaskGroup A
 
 The infrastructure code and documentation for TaskGroup A can be found in the [TaskGroupA](./TaskGroupA) directory.
-.
-├── environments/       # Environment-specific configurations (dev)
-│   └── dev/            # Development environment
-│       ├── main.tf     # Main configuration entry point
-│       ├── variables.tf# Variable definitions
-│       ├── outputs.tf  # Output definitions
-│       └── backend.tf  # Backend configuration
-├── modules/            # Reusable Terraform modules
-│   ├── network/        # VPC, Subnets, IGW, Route Tables
-│   ├── ec2/            # EC2 Instances, Security Groups
-│   ├── rds/            # RDS Database
-│   ├── cloudwatch/     # CloudWatch monitoring
-│   ├── iam/            # IAM roles and policies
-│   └── kms_and_secrets_manager/ # KMS and Secrets Manager
-└── README.md           # Project documentation
-```
 
 ## TaskGroup B
 
