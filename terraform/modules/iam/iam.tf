@@ -20,7 +20,7 @@ resource "aws_iam_role_policy" "rds_secret_access" {
 
 data "aws_iam_policy_document" "rds_trust_policy" {
   statement {
-    actions   = ["sts:AssumeRole"]
+    actions = ["sts:AssumeRole"]
     principals {
       type        = "Service"
       identifiers = ["rds.amazonaws.com"]

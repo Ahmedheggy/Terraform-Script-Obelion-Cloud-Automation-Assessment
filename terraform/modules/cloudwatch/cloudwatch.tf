@@ -6,9 +6,9 @@ resource "aws_cloudwatch_metric_alarm" "cpu_high" {
   evaluation_periods  = 1
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
-  period              = 300  # 5 minutes
+  period              = 300 # 5 minutes
   statistic           = "Average"
-  threshold           = 50   # Trigger alarm if CPU utilization > 50%
+  threshold           = 50 # Trigger alarm if CPU utilization > 50%
 
   # Monitoring specific EC2 instance
   dimensions = {
@@ -16,7 +16,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_high" {
   }
 
   alarm_actions = [
-    aws_sns_topic.alerts.arn  # SNS Topic ARN for notifications
+    aws_sns_topic.alerts.arn # SNS Topic ARN for notifications
   ]
 
   ok_actions = [

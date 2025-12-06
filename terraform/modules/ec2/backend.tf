@@ -1,7 +1,7 @@
 resource "aws_instance" "backend" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = var.instance_type
-  subnet_id                   = var.public_subnet_ids[0]
+  subnet_id                   = var.public_subnet_ids[1]
   vpc_security_group_ids      = [aws_security_group.backend_sg.id]
   associate_public_ip_address = true
   key_name                    = var.ssh_key_name

@@ -1,28 +1,19 @@
-# Obelion Cloud Infrastructure and CI/CD Automation
+# 🚀 Obelion Cloud Infrastructure & CI/CD
 
-This repository contains production-ready Infrastructure as Code (Terraform) and Continuous Integration/Continuous Deployment (CI/CD) automation using GitHub Actions for a secure, scalable 2-tier web application architecture on Amazon Web Services.
+> Infrastructure as Code (Terraform) and CI/CD automation for a secure, scalable 2-tier web application on AWS.
 
-## Table of Contents
-- [Architecture Overview](#architecture-overview)
-- [Infrastructure Components](#infrastructure-components)
-- [Repository Structure](#repository-structure)
-- [Prerequisites](#prerequisites)
-- [Deployment Guide](#deployment-guide)
-- [CI/CD Pipeline](#cicd-pipeline)
-- [Security Configuration](#security-configuration)
-- [Monitoring](#monitoring)
-- [Application Details](#application-details)
-- [Screenshots](#screenshots)
-- [Troubleshooting](#troubleshooting)
+## 📋 Quick Navigation
+[Architecture](#-architecture) • [Infrastructure](#️-infrastructure) • [Deployment](#-deployment) • [CI/CD](#-cicd-pipeline) • [Security](#-security) • [Monitoring](#-monitoring) • [Screenshots](#-screenshots)
 
-## Architecture Overview
+---
 
-### High-Level Architecture
+## 🏗️ Architecture
+
 ```mermaid
 graph LR
     User([👤 User]) -->|HTTP| Frontend
     Frontend[🖥️ Frontend<br/>Uptime Kuma<br/>Port 80] -->|Monitor| Backend
-    Backend[⚙️ Backend<br/>Laravel API<br/>Port 80] -->|Query| Database
+    Backend[⚙️ Backend<br/>Laravel API<br/>Port 8000] -->|Query| Database
     Database[(💾 RDS MySQL<br/>Multi-AZ<br/>Port 3306)]
     
     CloudWatch[📊 CloudWatch] -.->|Monitor| Frontend
@@ -36,400 +27,273 @@ graph LR
     style SNS fill:#E76F51,stroke:#B34F3A,color:#fff
 ```
 
-### Network Architecture
-```mermaid
-graph TB
-    Internet((Internet))
-    
-    subgraph VPC[VPC 10.0.0.0/16]
-        IGW[Internet Gateway]
-        
-        subgraph Public[Public Subnets - 2 AZs]
-            PubA[10.0.1.0/24<br/>us-east-1a]
-            PubB[10.0.2.0/24<br/>us-east-1b]
-        end
-        
-        subgraph Private[Private Subnets - 2 AZs]
-            PrivA[10.0.3.0/24<br/>us-east-1a]
-            PrivB[10.0.4.0/24<br/>us-east-1b]
-        end
-        
-        FE[Frontend EC2]
-        BE[Backend EC2]
-        DB[(RDS)]
-        
-        IGW --> PubA
-        IGW --> PubB
-        PubA -.-> FE
-        PubB -.-> BE
-        PrivA -.-> DB
-        PrivB -.-> DB
-    end
-    
-    Internet --> IGW
-    
-    style VPC fill:#f0f0f0,stroke:#333,stroke-width:3px
-    style Public fill:#d4edda,stroke:#28a745
-    style Private fill:#fff3cd,stroke:#ffc107
-    style FE fill:#4A90E2,color:#fff
-    style BE fill:#E27D60,color:#fff
-    style DB fill:#58A55C,color:#fff
-```
+---
 
-## Infrastructure Components
+## 🛠️ Infrastructure
 
-### Networking
-- **VPC**: Custom VPC with CIDR block 10.0.0.0/16
-- **Subnets**:
-  - 2 Public Subnets across 2 Availability Zones (us-east-1a, us-east-1b)
-  - 2 Private Subnets across 2 Availability Zones
-- **Internet Gateway**: Enables internet connectivity for public subnets
-- **Route Tables**: Separate route tables for public and private subnets
+<table>
+<tr>
+<td width="50%">
 
-### Compute (EC2)
-- **Frontend Instance**: 
-  - Ubuntu 22.04 LTS
-  - Hosts Uptime Kuma monitoring application
-  - Docker and Docker Compose installed
-  - Deployed in public subnet
-  
-- **Backend Instance**:
-  - Ubuntu 22.04 LTS
-  - Laravel PHP 8.3 application
-  - Apache2 web server
-  - Composer for dependency management
-  - Deployed in public subnet
+### 🌐 Network
+- **VPC**: `10.0.0.0/16`
+- **Public Subnets**: 2 AZs (us-east-1a/b)
+- **Private Subnets**: 2 AZs (us-east-1a/b)
+- **IGW**: Internet connectivity
 
-### Database (RDS)
+### 💻 Compute (EC2)
+**Frontend** (Ubuntu 22.04)
+- Uptime Kuma monitoring
+- Docker & Docker Compose
+- Public subnet (us-east-1a)
+
+**Backend** (Ubuntu 22.04)
+- Laravel PHP 8.3 API
+- Apache2 web server
+- Public subnet (us-east-1b)
+
+</td>
+<td width="50%">
+
+### 🗄️ Database (RDS)
 - **Engine**: MySQL 8.0
-- **Deployment**: Multi-AZ for high availability
-- **Storage**: Encrypted using AWS KMS
-- **Subnet Group**: Spans private subnets across multiple AZs
-- **Backup**: Automated backups enabled
+- **Deployment**: Multi-AZ
+- **Storage**: 20GB
+- **Backup**: 7 days retention
+- **Location**: Private subnets
 
-### Security
-- **KMS**: Encryption keys for RDS and Secrets Manager
-- **Secrets Manager**: Secure storage of database credentials
-- **IAM Roles**: Least privilege access for EC2 instances to access secrets
-- **Security Groups**: Layered security controls for each tier
+### 🔐 Security & Monitoring
+- Secrets Manager (DB credentials)
+- IAM roles (least privilege)
+- Security Groups (layered)
+- CloudWatch alarms (CPU 50%)
+- SNS email notifications
 
-### Monitoring
-- **CloudWatch**: 
-  - CPU utilization alarms for EC2 instances
-  - Automated notifications via SNS
-- **SNS**: Email notifications for critical alerts
+</td>
+</tr>
+</table>
 
-## Repository Structure
-
+### 📁 Repository Structure
 ```
 Obelion-Cloud-Assessment/
 ├── terraform/
-│   ├── environments/
-│   │   └── dev/
-│   │       ├── main.tf              # Root module orchestration
-│   │       ├── variables.tf         # Input variables
-│   │       ├── outputs.tf           # Output values
-│   │       └── backend.tf           # Backend configuration
-│   └── modules/
-│       ├── network/                 # VPC, subnets, IGW, route tables
-│       ├── ec2/                     # EC2 instances and security groups
-│       │   ├── ami.tf              # AMI data source
-│       │   ├── frontend.tf         # Frontend instance
-│       │   ├── backend.tf          # Backend instance
-│       │   └── sg.tf               # Security groups
-│       ├── rds/                     # RDS database configuration
-│       ├── kms_and_secrets_manager/ # KMS keys and secrets
-│       ├── cloudwatch/              # CloudWatch alarms and SNS
-│       └── iam/                     # IAM roles and policies
+│   ├── environments/dev/        # Terraform configs (main, variables, outputs)
+│   └── modules/                 # network, ec2, rds, cloudwatch, iam, kms
 ├── apps/
-│   ├── Frontend/
-│   │   └── deploy(frontend).yml    # Frontend CI/CD pipeline
-│   └── Backend/
-│       └── deploy(backend).yml      # Backend CI/CD pipeline
-└── imgs/                            # Screenshots and diagrams
+│   ├── Frontend/                # deploy(frontend).yml
+│   └── Backend/                 # deploy(backend).yml
+└── imgs/                        # Screenshots
 ```
 
-## Prerequisites
+---
 
-### Required Tools
+## 🚀 Deployment
+
+### Prerequisites
+```bash
+# Required
 - Terraform >= 1.0.0
-- AWS CLI configured with appropriate credentials
-- SSH key pair for EC2 access
+- AWS CLI (configured)
+- SSH key pair
 - Git
+```
 
-### AWS Permissions
-The AWS IAM user/role must have permissions to create:
-- VPC, Subnets, Route Tables, Internet Gateway
-- EC2 Instances, Security Groups
-- RDS Instances, DB Subnet Groups
-- KMS Keys, Secrets Manager secrets
-- CloudWatch Alarms, SNS Topics
-- IAM Roles and Policies
-
-## Deployment Guide
-
-### Step 1: Infrastructure Provisioning
-
-1. Clone this repository:
+### Quick Start
 ```bash
-git clone https://github.com/Ahmedheggy/Terraform-Script-Obelion-Cloud-Automation-Assessment.git
+# 1. Clone repository
+git clone https://github.com/Ahmedheggy/Obelion-Cloud-Assessment.git
 cd Obelion-Cloud-Assessment/terraform/environments/dev
-```
 
-2. Initialize Terraform:
-```bash
+# 2. Initialize & Deploy
 terraform init
-```
-
-3. Review the planned changes:
-```bash
 terraform plan
-```
-
-4. Apply the configuration:
-```bash
 terraform apply
+
+# 3. Get outputs
+terraform output
 ```
 
-5. Note the outputs:
-```
-Outputs:
-frontend_public_ip = "54.xxx.xxx.xxx"
-backend_public_ip = "18.xxx.xxx.xxx"
-db_endpoint = "terraform-xxxxxxx.xxxxxxx.us-east-1.rds.amazonaws.com"
-```
+**Outputs:**
+- `frontend_public_ip` - Access Uptime Kuma
+- `backend_public_ip` - Laravel API endpoint
+- `db_endpoint` - RDS MySQL endpoint
 
-### Step 2: Application Deployment
+### Applications
 
-#### Frontend Application (Uptime Kuma)
-The frontend is automatically deployed via the EC2 user_data script which:
-1. Installs Docker and Docker Compose
-2. Sets up the application directory at `/opt/uptime-kuma`
-3. Waits for CI/CD pipeline to deploy the application
+| Application | Description | Repository | Access |
+|------------|-------------|------------|--------|
+| **Frontend** | Uptime Kuma monitoring tool | [uptime-kuma](https://github.com/Ahmedheggy/uptime-kuma) | `http://<frontend_ip>` |
+| **Backend** | Laravel PHP API | [laravel](https://github.com/Ahmedheggy/laravel) | Deployed via GitOps |
 
-**Repository**: https://github.com/Ahmedheggy/uptime-kuma.git
+---
 
-Access the frontend at: `http://<frontend_public_ip>`
-
-#### Backend Application (Laravel)
-The backend is automatically provisioned with:
-1. PHP 8.3 and required extensions
-2. Composer (latest version)
-3. Apache2 web server
-
-The application code is deployed via GitHub Actions.
-
-**Repository**: https://github.com/Ahmedheggy/laravel.git
-
-## CI/CD Pipeline
+## 🔄 CI/CD Pipeline
 
 ### Frontend Workflow
+**Trigger:** Push to `main` → **File:** `apps/Frontend/deploy(frontend).yml`
 
-**Trigger**: Push to `main` branch
+```mermaid
+graph LR
+    A[Push to main] --> B[Build]
+    B --> C[SCP docker-compose.yml]
+    C --> D[SSH to EC2]
+    D --> E[Update port mapping]
+    E --> F[Pull image]
+    F --> G[Restart containers]
+```
 
-**Workflow File**: `apps/Frontend/deploy(frontend).yml`
-
-**Pipeline Stages**:
-1. **Build**: Validation and preparation
-2. **Deploy**:
-   - Copy docker-compose.yml to the server via SCP
-   - SSH into the Frontend instance
-   - Modify port mapping (3001 → 80)
-   - Pull the latest Docker image
-   - Restart containers using docker-compose
+**GitHub Secrets:** `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY`
 
 ### Backend Workflow
+**Trigger:** Push to `main` → **File:** `apps/Backend/deploy(backend).yml`
 
-**Trigger**: Push to `main` branch
+```mermaid
+graph LR
+    A[Push to main] --> B[SSH to EC2]
+    B --> C[Git pull]
+    C --> D[Update .env]
+    D --> E[Composer install]
+    E --> F[Run migrations]
+```
 
-**Workflow File**: `apps/Backend/deploy(backend).yml`
+**GitHub Secrets:** `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY`, `DB_HOST`, `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD`
 
-**Pipeline Stages**:
-1. **Deploy**:
-   - SSH into Backend instance
-   - Pull latest code changes from repository
-   - Create/update `.env` file with database secrets
-   - Install dependencies via Composer
-   - Run database migrations
+---
 
-### Required GitHub Secrets
-
-#### Frontend Repository Secrets:
-- `SSH_HOST`: Frontend instance public IP
-- `SSH_USER`: ubuntu
-- `SSH_PRIVATE_KEY`: Private key content for SSH access
-
-#### Backend Repository Secrets:
-- `SSH_HOST`: Backend instance public IP
-- `SSH_USER`: ubuntu
-- `SSH_PRIVATE_KEY`: Private key content for SSH access
-- `DB_HOST`: RDS endpoint
-- `DB_NAME`: Database name
-- `DB_USERNAME`: Database username
-- `DB_PASSWORD`: Database password
-
-## Security Configuration
+## 🔐 Security
 
 ### Defense in Depth
 
-1. **Network Layer**:
-   - Private subnets for RDS instances
-   - Public subnets for application tiers with controlled ingress
-   
-2. **Security Groups**:
-   - Frontend SG: Allows HTTP (80) and SSH (22) from anywhere
-   - Backend SG: Allows HTTP (80) only from Frontend SG, SSH from anywhere
-   - Database SG: Allows MySQL (3306) only from Backend SG
+| Layer | Configuration |
+|-------|---------------|
+| **Network** | Private subnets for RDS, public for apps |
+| **Frontend SG** | HTTP (80), SSH (22) from `0.0.0.0/0` |
+| **Backend SG** | HTTP (8000) from Frontend SG only, SSH from `0.0.0.0/0` |
+| **Database SG** | MySQL (3306) from Backend SG only |
+| **Secrets** | Secrets Manager for DB credentials |
+| **IAM** | Least privilege roles for EC2 → Secrets access |
 
-3. **Encryption**:
-   - RDS storage encrypted using AWS KMS
-   - Database credentials stored in AWS Secrets Manager
+**Best Practices:** ✅ Multi-AZ database ✅ Isolated subnets ✅ No hardcoded secrets ✅ Least privilege access
 
-4. **Identity & Access**:
-   - IAM roles with least privilege access
-   - EC2 instances can only access specific secrets
+---
 
-### Security Best Practices
+## 📊 Monitoring
 
-- ✅ All data encrypted at rest (RDS, Secrets Manager)
-- ✅ Least privilege IAM policies
-- ✅ Multi-AZ deployment for database high availability
-- ✅ Security groups following principle of least privilege
-- ✅ Secrets stored in AWS Secrets Manager, not in code
+**CloudWatch Alarms:**
+- CPU > 50% → SNS email alert
+- Instance health checks
 
-## Monitoring
+**Uptime Kuma:**
+- Real-time dashboard
+- HTTP/HTTPS monitoring
+- Response time tracking
+- Uptime percentage
 
-### CloudWatch Alarms
-- **CPU Utilization**: Alerts when EC2 instances exceed 80% CPU
-- **Instance Health**: Monitors EC2 instance status checks
+---
 
-### SNS Notifications
-- Email notifications configured for all CloudWatch alarms
-- Subscription requires email confirmation
+## 📸 Screenshots
 
-### Application Monitoring
-- **Uptime Kuma**: Provides real-time monitoring of the Laravel backend
-- **Dashboard**: Visual representation of service health and response times
+<table>
+<tr>
+<td width="50%">
 
-## Application Details
+### Uptime Kuma DB Config
+![DB Config](imgs/uptimekuma-dbconfig.png)
 
-### Frontend: Uptime Kuma
-Uptime Kuma is a self-hosted monitoring tool similar to "Uptime Robot":
-- **Features**:
-  - Real-time monitoring dashboard
-  - HTTP/HTTPS monitoring
-  - Response time tracking
-  - Uptime percentage calculation
-  - Alert notifications
-- **Access**: HTTP on port 80
-- **Storage**: SQLite database
+### Monitor Dashboard
+![Dashboard](imgs/monitor-dashboard.png)
 
-### Backend: Laravel API
-Laravel is a modern PHP framework for web applications:
-- **Version**: PHP 8.3
-- **Framework**: Laravel (latest)
-- **Database**: MySQL via RDS
-- **Web Server**: Apache2
-- **Features**: RESTful API endpoints
+</td>
+<td width="50%">
 
-## Screenshots
+### Adding Laravel Monitor
+![Adding Monitor](imgs/adding-laravel-monitor.png)
 
-### 1. Uptime Kuma Database Configuration
-Initial database setup screen for Uptime Kuma.
+### Monitoring Success
+![Success](imgs/montoringsuccess.png)
 
-![Uptime Kuma DB Config](imgs/uptimekuma-dbconfig.png)
+</td>
+</tr>
+<tr>
+<td colspan="2">
 
-### 2. Monitor Dashboard
-Clean dashboard interface showing monitor status summary.
-
-![Monitor Dashboard](imgs/monitor-dashboard.png)
-
-### 3. Adding Laravel Backend Monitor
-Configuration screen for adding a new HTTP monitor pointing to the Laravel backend API.
-
-![Adding Laravel Monitor](imgs/adding-laravel-monitor.png)
-
-### 4. Monitoring Success
-Successful monitoring showing the Laravel backend is up with uptime and response time metrics.
-
-![Monitoring Success](imgs/montoringsuccess.png)
-
-### 5. CloudWatch Monitoring
-CloudWatch dashboard showing EC2 instance metrics and alarms.
-
+### CloudWatch Monitoring
 ![CloudWatch](imgs/cloudwatch.png)
 
-## Troubleshooting
-
-### Common Issues
-
-**Issue**: Terraform apply fails with subnet group error
-```
-Error: DB Subnet Group doesn't meet availability zone coverage requirement
-```
-**Solution**: Ensure at least 2 subnets in different AZs are specified in the RDS subnet group configuration.
+</td>
+</tr>
+</table>
 
 ---
 
-**Issue**: Frontend application not accessible
-**Solution**: 
-1. Check security group allows inbound traffic on port 80
-2. Verify instance is running: `terraform output frontend_instance_id`
-3. SSH into instance and check Docker containers: `sudo docker-compose ps`
+## 🔧 Troubleshooting
 
----
+<details>
+<summary><b>Terraform: Subnet group AZ coverage error</b></summary>
 
-**Issue**: Backend cannot connect to database
-**Solution**:
-1. Verify RDS security group allows traffic from backend security group on port 3306
-2. Check `.env` file has correct database credentials
-3. Verify RDS endpoint: `terraform output db_endpoint`
+Ensure RDS subnet group has ≥2 subnets in different AZs.
+</details>
 
----
-
-**Issue**: GitHub Actions deployment fails
-**Solution**:
-1. Verify all required secrets are configured in GitHub repository settings
-2. Check SSH key has proper permissions (no passphrase)
-3. Verify instance IPs match the secrets
-
-### Useful Commands
+<details>
+<summary><b>Frontend not accessible</b></summary>
 
 ```bash
-# SSH into frontend instance
-ssh -i /path/to/key.pem ubuntu@<frontend_public_ip>
+# Check security group port 80
+terraform output frontend_instance_id
+ssh ubuntu@<frontend_ip> "sudo docker-compose ps"
+```
+</details>
 
-# SSH into backend instance
-ssh -i /path/to/key.pem ubuntu@<backend_public_ip>
+<details>
+<summary><b>Backend DB connection failed</b></summary>
 
-# Check Docker containers on frontend
-sudo docker-compose ps
+```bash
+# Verify security group allows 3306 from backend
+# Check .env credentials
+terraform output db_endpoint
+```
+</details>
+
+<details>
+<summary><b>GitHub Actions deployment fails</b></summary>
+
+- Verify all secrets configured in repository settings
+- SSH key must have no passphrase
+- IP addresses match terraform outputs
+</details>
+
+### Useful Commands
+```bash
+# SSH access
+ssh -i key.pem ubuntu@<ip>
+
+# Docker logs (frontend)
 sudo docker-compose logs -f
 
-# Check Laravel logs on backend
+# Laravel logs (backend)
 tail -f ~/app/storage/logs/laravel.log
 
-# Test database connectivity from backend
-mysql -h <rds_endpoint> -u <username> -p
+# Test DB connection
+mysql -h <rds_endpoint> -u <user> -p
 
-# View Terraform state
+# Terraform operations
 terraform show
-
-# Destroy all infrastructure (careful!)
-terraform destroy
+terraform destroy  # ⚠️ Careful!
 ```
 
-## License
+---
 
-This project is part of the Obelion Cloud Assessment.
+## 📚 Resources
 
-## Author
+**Repositories:**
+- [Infrastructure (This repo)](https://github.com/Ahmedheggy/Terraform-Script-Obelion-Cloud-Automation-Assessment)
+- [Frontend - Uptime Kuma](https://github.com/Ahmedheggy/uptime-kuma)
+- [Backend - Laravel](https://github.com/Ahmedheggy/laravel)
 
-**Ahmed Hany**
-- GitHub: [@Ahmedheggy](https://github.com/Ahmedheggy)
+**License:** Obelion Cloud Assessment Project
 
-## Repository Links
+---
 
-- **Infrastructure Repository**: https://github.com/Ahmedheggy/Terraform-Script-Obelion-Cloud-Automation-Assessment
-- **Frontend Repository**: https://github.com/Ahmedheggy/uptime-kuma
-- **Backend Repository**: https://github.com/Ahmedheggy/laravel
+<div align="center">
+<b>Built with ❤️ using Terraform, Docker, GitHub Actions</b>
+</div>

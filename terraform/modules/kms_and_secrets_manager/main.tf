@@ -13,5 +13,5 @@ resource "aws_secretsmanager_secret" "db_password" {
 # Create a new secret version with a dynamic password
 resource "aws_secretsmanager_secret_version" "db_password_version" {
   secret_id     = aws_secretsmanager_secret.db_password.id
-  secret_string = jsonencode({ password = var.db_password })  # Fetch password securely from a variable
+  secret_string = jsonencode({ password = var.db_password }) # Fetch password securely from a variable
 }
